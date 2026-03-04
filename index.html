@@ -21,34 +21,30 @@
 
     /* Main content box with flickering glow */
     .content-box {
-  position: relative;
-  padding: 40px;
-  max-width: 900px;
-  width: 90%;
-  border-radius: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-
-  /* GIF background */
-  background: url("eyes.gif") center/cover no-repeat;
-
-  /* glow */
-  box-shadow: 0 0 25px #ff0033, 0 0 50px #ff33ff;
-  animation: glowFlicker 3s infinite;
-  .content-box::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6); /* dark overlay */
-  z-index: 0;
-}
-.content-box > * {
-  position: relative;
-  z-index: 1;
-}
-}
+      position: relative;
+      padding: 40px;
+      max-width: 900px;
+      width: 90%;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      background: url("eyes.gif") center/cover no-repeat;
+      box-shadow: 0 0 25px #ff0033, 0 0 50px #ff33ff;
+      animation: glowFlicker 3s infinite;
+    }
+    .content-box::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 0;
+    }
+    .content-box > * {
+      position: relative;
+      z-index: 1;
+    }
 
     @keyframes glowFlicker {
       0%   { box-shadow: 0 0 20px #ff0033, 0 0 40px #7c0000; }
@@ -186,18 +182,19 @@
     .social-icon:nth-child(1) { animation-delay: 0s, 0s; }
     .social-icon:nth-child(2) { animation-delay: 0.2s, 0s; }
     .social-icon:nth-child(3) { animation-delay: 0.4s, 0s; }
+
     /* Lightbox */
     #lightbox {
       position: fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background-color: rgba(0,0,0,0.9);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
     }
 
     #lightbox img {
@@ -205,43 +202,66 @@
       max-height: 90%;
       border: 3px solid #ff0033;
     }
-    /* Lightbox */
- #lightbox {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.9);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
 
-/* Lightbox image */
-#lightbox img {
-  max-width: 90%;
-  max-height: 90%;
-  border: 3px solid #ff0033;
-}
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      color: #ff0033;
+      cursor: pointer;
+      text-shadow: 0 0 10px #ff0033;
+      transition: transform 0.2s, text-shadow 0.2s;
+    }
 
-/* Close button */
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 40px;
-  color: #ff0033;
-  cursor: pointer;
-  text-shadow: 0 0 10px #ff0033;
-  transition: transform 0.2s, text-shadow 0.2s;
-}
+    .close-btn:hover {
+      transform: scale(1.2);
+      text-shadow: 0 0 20px #ff33ff;
+    }
 
-.close-btn:hover {
-  transform: scale(1.2);
-  text-shadow: 0 0 20px #ff33ff;
-}
+    /* Guestbook styling */
+    .guestbook-entry {
+      color: #ed6161;
+      text-shadow: 0 0 5px #ff0000, 0 0 10px #ff5f5f;
+      margin-bottom: 10px;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .guestbook-title {
+   color: #b80025;          
+   text-align: center;       
+   text-shadow: 0 0 10px #ff0033; 
+   }
+
+    .guestbook-pagination {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .guestbook-pagination button {
+      background: none;
+      border: 1px solid #ec0000;
+      color: #930000;
+      padding: 3px 8px;
+      margin: 0 2px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-shadow: 0 0 3px #ff0000;
+      transition: all 0.2s;
+      animation: pulseGlow 2s infinite alternate;
+    }
+
+    .guestbook-pagination button:hover {
+      background-color: rgba(255, 124, 124, 0.2);
+      box-shadow: 0 0 5px #ff7c7c;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 3px #ff0000; }
+      50% { box-shadow: 0 0 8px #ff7cb3; }
+      100% { box-shadow: 0 0 3px #ff0000; }
+    }
   </style>
 </head>
 
@@ -271,8 +291,8 @@
 
   <!-- Lightbox container -->
   <div id="lightbox">
-  <span class="close-btn" onclick="closeLightbox()">✖</span>
-  <img src="" alt="Enlarged image">
+    <span class="close-btn" onclick="closeLightbox()">✖</span>
+    <img src="" alt="Enlarged image">
   </div>
 
   <!-- Main content box -->
@@ -300,7 +320,7 @@
       <div class="wip-section"> 👍︎□︎❍︎♓︎■︎♑︎ ⬧︎□︎□︎■︎✏︎ 🕈︎♏︎♌︎♍︎□︎❍︎♓︎♍︎ - Tуга</div>
     </div>
 
-  <!-- Socials row -->
+      <!-- Socials row -->
     <div class="socials">
       <a href="https://www.tumblr.com/carc4ss" target="_blank">
         <img src="tumblr.png" alt="Tumblr" class="social-icon">
@@ -313,7 +333,89 @@
       </a>
     </div>
 
-  </div>
+    <h2 class="guestbook-title">Sign My Guestbook!</h2>
 
+    <form id="guestbook-form">
+      <input type="text" id="name" placeholder="Your name..." required><br><br>
+      <textarea id="message" placeholder="Leave something silly..." required></textarea><br><br>
+      <button type="submit">Submit</button>
+    </form>
+
+    <div id="guestbook-messages"></div>
+
+   <!-- Load Supabase JS client library -->
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+
+     <script>
+      const supabaseUrl = "https://gymuiyygligrezsiclgc.supabase.co";
+      const supabaseKey = "sb_publishable_g0DIw52N3bjLps7OycLovw_1Na2Xtdp";
+      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+      const form = document.getElementById("guestbook-form");
+      const messagesDiv = document.getElementById("guestbook-messages");
+
+      const entriesPerPage = 5;
+      let currentPage = 1;
+      let allEntries = [];
+
+      async function loadMessages() {
+        const { data } = await supabase
+          .from("guestbook")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        allEntries = data;
+        renderPage(currentPage);
+      }
+
+      function renderPage(page) {
+        messagesDiv.innerHTML = "";
+
+        const start = (page - 1) * entriesPerPage;
+        const end = start + entriesPerPage;
+        const pageEntries = allEntries.slice(start, end);
+
+        pageEntries.forEach(entry => {
+          const div = document.createElement("div");
+          div.className = "guestbook-entry";
+          div.innerHTML = `<strong>${entry.name}</strong>: ${entry.message}<hr>`;
+          messagesDiv.appendChild(div);
+        });
+
+        renderPagination();
+      }
+
+      function renderPagination() {
+        const totalPages = Math.ceil(allEntries.length / entriesPerPage);
+        let paginationHtml = '<div class="guestbook-pagination">';
+
+        for (let i = 1; i <= totalPages; i++) {
+          paginationHtml += `<button onclick="goToPage(${i})">${i}</button>`;
+        }
+
+        paginationHtml += '</div>';
+        messagesDiv.insertAdjacentHTML('beforeend', paginationHtml);
+      }
+
+      function goToPage(page) {
+        currentPage = page;
+        renderPage(page);
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("name").value;
+        const message = document.getElementById("message").value;
+
+        await supabase.from("guestbook").insert([{ name, message }]);
+        form.reset();
+        await loadMessages();
+      });
+
+      loadMessages();
+    </script>
+
+  </div>
 </body>
 </html>
