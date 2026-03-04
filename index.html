@@ -344,14 +344,14 @@
     <div id="guestbook-messages"></div>
 
    <!-- Load Supabase JS client library -->
-   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
 
-   <script>
+   <script type="module">
+   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
    const supabaseUrl = "https://gymuiyygligrezsiclgc.supabase.co";
    const supabaseKey = "sb_publishable_g0DIw52N3bjLps7OycLovw_1Na2Xtdp";
 
-   // FIXED: Use the correct global variable for Supabase client creation
-   const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+   const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
    const form = document.getElementById("guestbook-form");
    const messagesDiv = document.getElementById("guestbook-messages");
@@ -375,7 +375,7 @@
     renderPage(currentPage);
   }
 
-  function renderPage(page) {
+   function renderPage(page) {
     messagesDiv.innerHTML = "";
 
     const start = (page - 1) * entriesPerPage;
@@ -386,7 +386,6 @@
       const div = document.createElement("div");
       div.className = "guestbook-entry";
 
-      // SAFE version (prevents HTML injection)
       const strong = document.createElement("strong");
       strong.textContent = entry.name;
 
@@ -402,7 +401,7 @@
     renderPagination();
   }
 
-  function renderPagination() {
+   function renderPagination() {
     const totalPages = Math.ceil(allEntries.length / entriesPerPage);
     if (totalPages <= 1) return;
 
@@ -419,12 +418,12 @@
     messagesDiv.appendChild(paginationDiv);
   }
 
-  function goToPage(page) {
+   function goToPage(page) {
     currentPage = page;
     renderPage(page);
   }
 
-  form.addEventListener("submit", async (e) => {
+   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const name = document.getElementById("name").value.trim();
@@ -446,8 +445,8 @@
     await loadMessages();
   });
 
-  loadMessages();
-  </script>
+   loadMessages();
+ </script>
 
   </div>
 </body>
