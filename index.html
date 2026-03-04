@@ -344,77 +344,110 @@
     <div id="guestbook-messages"></div>
 
    <!-- Load Supabase JS client library -->
-     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
 
-     <script>
-      const supabaseUrl = "https://gymuiyygligrezsiclgc.supabase.co";
-      const supabaseKey = "sb_publishable_g0DIw52N3bjLps7OycLovw_1Na2Xtdp";
-      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+   <script>
+   const supabaseUrl = "https://gymuiyygligrezsiclgc.supabase.co";
+   const supabaseKey = "sb_publishable_g0DIw52N3bjLps7OycLovw_1Na2Xtdp";
 
-      const form = document.getElementById("guestbook-form");
-      const messagesDiv = document.getElementById("guestbook-messages");
+   // FIXED: Use the correct global variable for Supabase client creation
+   const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-      const entriesPerPage = 5;
-      let currentPage = 1;
-      let allEntries = [];
+   const form = document.getElementById("guestbook-form");
+   const messagesDiv = document.getElementById("guestbook-messages");
 
-      async function loadMessages() {
-        const { data } = await supabase
-          .from("guestbook")
-          .select("*")
-          .order("created_at", { ascending: false });
+   const entriesPerPage = 5;
+   let currentPage = 1;
+   let allEntries = [];
 
-        allEntries = data;
-        renderPage(currentPage);
-      }
+   async function loadMessages() {
+    const { data, error } = await supabaseClient
+      .from("guestbook")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-      function renderPage(page) {
-        messagesDiv.innerHTML = "";
+    if (error) {
+      console.error("Error loading messages:", error);
+      return;
+    }
 
-        const start = (page - 1) * entriesPerPage;
-        const end = start + entriesPerPage;
-        const pageEntries = allEntries.slice(start, end);
+    allEntries = data || [];
+    renderPage(currentPage);
+  }
 
-        pageEntries.forEach(entry => {
-          const div = document.createElement("div");
-          div.className = "guestbook-entry";
-          div.innerHTML = `<strong>${entry.name}</strong>: ${entry.message}<hr>`;
-          messagesDiv.appendChild(div);
-        });
+  function renderPage(page) {
+    messagesDiv.innerHTML = "";
 
-        renderPagination();
-      }
+    const start = (page - 1) * entriesPerPage;
+    const end = start + entriesPerPage;
+    const pageEntries = allEntries.slice(start, end);
 
-      function renderPagination() {
-        const totalPages = Math.ceil(allEntries.length / entriesPerPage);
-        let paginationHtml = '<div class="guestbook-pagination">';
+    pageEntries.forEach(entry => {
+      const div = document.createElement("div");
+      div.className = "guestbook-entry";
 
-        for (let i = 1; i <= totalPages; i++) {
-          paginationHtml += `<button onclick="goToPage(${i})">${i}</button>`;
-        }
+      // SAFE version (prevents HTML injection)
+      const strong = document.createElement("strong");
+      strong.textContent = entry.name;
 
-        paginationHtml += '</div>';
-        messagesDiv.insertAdjacentHTML('beforeend', paginationHtml);
-      }
+      const text = document.createTextNode(": " + entry.message);
 
-      function goToPage(page) {
-        currentPage = page;
-        renderPage(page);
-      }
+      div.appendChild(strong);
+      div.appendChild(text);
+      div.appendChild(document.createElement("hr"));
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+      messagesDiv.appendChild(div);
+    });
 
-        const name = document.getElementById("name").value;
-        const message = document.getElementById("message").value;
+    renderPagination();
+  }
 
-        await supabase.from("guestbook").insert([{ name, message }]);
-        form.reset();
-        await loadMessages();
-      });
+  function renderPagination() {
+    const totalPages = Math.ceil(allEntries.length / entriesPerPage);
+    if (totalPages <= 1) return;
 
-      loadMessages();
-    </script>
+    const paginationDiv = document.createElement("div");
+    paginationDiv.className = "guestbook-pagination";
+
+    for (let i = 1; i <= totalPages; i++) {
+      const button = document.createElement("button");
+      button.textContent = i;
+      button.onclick = () => goToPage(i);
+      paginationDiv.appendChild(button);
+    }
+
+    messagesDiv.appendChild(paginationDiv);
+  }
+
+  function goToPage(page) {
+    currentPage = page;
+    renderPage(page);
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const message = document.getElementById("message").value.trim();
+
+    if (!name || !message) return;
+
+    const { error } = await supabaseClient
+      .from("guestbook")
+      .insert([{ name, message }]);
+
+    if (error) {
+      console.error("Insert error:", error);
+      alert("Something went wrong! Check console.");
+      return;
+    }
+
+    form.reset();
+    await loadMessages();
+  });
+
+  loadMessages();
+  </script>
 
   </div>
 </body>
