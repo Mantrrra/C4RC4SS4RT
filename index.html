@@ -349,119 +349,163 @@
    <button type="submit">Submit</button>
    </form>
 
+   <!-- Messages container -->
    <div id="guestbook-messages"></div>
 
-   <script type="module">
-   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+   <style>
+   /* Guestbook messages container */
+   #guestbook-messages {
+    width: 90%;
+    max-height: 400px;          /* scrollable height */
+    overflow-y: auto;
+    margin: 20px auto 0 auto;
+    padding: 10px;
+    border: 2px solid #ff0033;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.4);
+  }
 
-   const supabaseUrl = "https://gymuiyygligrezsiclgc.supabase.co";
-   const supabaseKey = "sb_publishable_g0DIw52N3bjLps7OycLovw_1Na2Xtdp";
-   const supabaseClient = createClient(supabaseUrl, supabaseKey);
+  .guestbook-entry {
+    color: #ed6161;
+    text-shadow: 0 0 5px #ff0000, 0 0 10px #ff5f5f;
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 5px;
+  }
 
-   const form = document.getElementById("guestbook-form");
-   const messagesDiv = document.getElementById("guestbook-messages");
+  .guestbook-pagination {
+    text-align: center;
+    margin-top: 10px;
+  }
 
-   const entriesPerPage = 5;
-   let currentPage = 1;
-   let allEntries = [];
+  .guestbook-pagination button {
+    background: none;
+    border: 1px solid #ec0000;
+    color: #930000;
+    padding: 3px 8px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-shadow: 0 0 3px #ff0000;
+    transition: all 0.2s;
+    animation: pulseGlow 2s infinite alternate;
+  }
 
-   async function loadMessages() {
-   const { data, error } = await supabaseClient
-    .from("guestbook")
-    .select("*")
-    .order("created_at", { ascending: false });
+  .guestbook-pagination button:hover {
+    background-color: rgba(255, 124, 124, 0.2);
+    box-shadow: 0 0 5px #ff7c7c;
+  }
+
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 3px #ff0000; }
+    50% { box-shadow: 0 0 8px #ff7cb3; }
+    100% { box-shadow: 0 0 3px #ff0000; }
+  }
+ </style>
+
+ <script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const supabaseUrl = "https://gymuiyygligrezsiclgc.supabase.co";
+  const supabaseKey = "sb_publishable_g0DIw52N3bjLps7OycLovw_1Na2Xtdp";
+
+  const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+  const form = document.getElementById("guestbook-form");
+  const messagesDiv = document.getElementById("guestbook-messages");
+
+  const entriesPerPage = 5;
+  let currentPage = 1;
+  let allEntries = [];
+
+  async function loadMessages() {
+    const { data, error } = await supabaseClient
+      .from("guestbook")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) {
-    console.error("Error loading messages:", error);
-    return;
-   }
+      console.error("Error loading messages:", error);
+      return;
+    }
 
-   allEntries = data || [];
-   renderPage(currentPage);
-   }
+    allEntries = data || [];
+    renderPage(currentPage);
+  }
 
-   function renderPage(page) {
-   messagesDiv.innerHTML = "";
+  function renderPage(page) {
+    messagesDiv.innerHTML = "";
 
-   const start = (page - 1) * entriesPerPage;
-   const end = start + entriesPerPage;
-   const pageEntries = allEntries.slice(start, end);
+     const start = (page - 1) * entriesPerPage;
+     const end = start + entriesPerPage;
+     const pageEntries = allEntries.slice(start, end);
 
-    pageEntries.forEach(entry => {
-    const div = document.createElement("div");
-    div.className = "guestbook-entry new-entry"; // TEMP highlight
+     pageEntries.forEach(entry => {
+      const div = document.createElement("div");
+      div.className = "guestbook-entry";
 
-    const strong = document.createElement("strong");
-    strong.textContent = entry.name;
+      const strong = document.createElement("strong");
+      strong.textContent = entry.name;
 
-    const text = document.createTextNode(": " + entry.message);
+      const text = document.createTextNode(": " + entry.message);
 
-    div.appendChild(strong);
-    div.appendChild(text);
-    div.appendChild(document.createElement("hr"));
+      div.appendChild(strong);
+      div.appendChild(text);
+      div.appendChild(document.createElement("hr"));
 
-    messagesDiv.appendChild(div);
+      messagesDiv.appendChild(div);
+     });
 
-    // Remove highlight after animation
-    setTimeout(() => {
-      div.classList.remove("new-entry");
-    }, 1500);
-   });
+     renderPagination();
 
-   renderPagination();
+     // scroll to top of messages container when page changes
+     messagesDiv.scrollTop = 0;
+     }
 
-   // Auto-scroll to newest message
-   const newestMessage = messagesDiv.querySelector(".guestbook-entry");
-   if (newestMessage) {
-    newestMessage.scrollIntoView({ behavior: "smooth" });
-   }
-   }
+     function renderPagination() {
+     const totalPages = Math.ceil(allEntries.length / entriesPerPage);
+     if (totalPages <= 1) return;
 
-   function renderPagination() {
-   const totalPages = Math.ceil(allEntries.length / entriesPerPage);
-   if (totalPages <= 1) return;
+     const paginationDiv = document.createElement("div");
+     paginationDiv.className = "guestbook-pagination";
 
-   const paginationDiv = document.createElement("div");
-   paginationDiv.className = "guestbook-pagination";
+     for (let i = 1; i <= totalPages; i++) {
+      const button = document.createElement("button");
+      button.textContent = i;
+      button.onclick = () => goToPage(i);
+      paginationDiv.appendChild(button);
+     }
 
-   for (let i = 1; i <= totalPages; i++) {
-    const button = document.createElement("button");
-    button.textContent = i;
-    button.onclick = () => goToPage(i);
-    paginationDiv.appendChild(button);
-   }
+     messagesDiv.appendChild(paginationDiv);
+     }
 
-   messagesDiv.appendChild(paginationDiv);
-   }
+     function goToPage(page) {
+     currentPage = page;
+     renderPage(page);
+     }
 
-   function goToPage(page) {
-   currentPage = page;
-   renderPage(page);
-   }
+     form.addEventListener("submit", async (e) => {
+     e.preventDefault();
 
-   form.addEventListener("submit", async (e) => {
-   e.preventDefault();
+     const name = document.getElementById("name").value.trim();
+     const message = document.getElementById("message").value.trim();
+     if (!name || !message) return;
 
-   const name = document.getElementById("name").value.trim();
-   const message = document.getElementById("message").value.trim();
-   if (!name || !message) return;
+     const { error } = await supabaseClient
+      .from("guestbook")
+      .insert([{ name, message }]);
 
-   const { error } = await supabaseClient
-    .from("guestbook")
-    .insert([{ name, message }]);
+      if (error) {
+      console.error("Insert error:", error);
+      alert("Something went wrong! Check console.");
+      return;
+      }
 
-   if (error) {
-    console.error("Insert error:", error);
-    alert("Something went wrong! Check console.");
-    return;
-   }
+     form.reset();
+     await loadMessages();
+     });
 
-   form.reset();
-   await loadMessages();
-   });
-
-   // Initial load
-   loadMessages();
+     loadMessages();
    </script>
    
    </div>
