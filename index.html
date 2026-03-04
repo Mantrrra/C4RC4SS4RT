@@ -336,12 +336,13 @@
     <h2 class="guestbook-title">Sign My Guestbook!</h2>
 
     <form id="guestbook-form">
-      <input type="text" id="name" placeholder="Your name..." required><br><br>
-      <textarea id="message" placeholder="Leave something silly..." required></textarea><br><br>
-      <button type="submit">Submit</button>
-    </form>
+   <input type="text" id="name" placeholder="Your name..." required autocomplete="name"><br><br>
+   <textarea id="message" placeholder="Leave something silly..." required autocomplete="off"></textarea><br><br>
+   <button type="submit">Submit</button>
+   </form>
 
-    <div id="guestbook-messages"></div>
+   <div id="guestbook-messages"></div>
+
 
    <!-- Load Supabase JS client library -->
 
